@@ -1,0 +1,92 @@
+blueprint:
+  name: "Cast & Recast dashboard view (Timed)"
+  description: "Cast a dashboard view to a Google Hub when it's off or idle or paused for 20 seconds. This tries to bypass the 10 min timeout for the picture frame by re-casting every 9 min."
+                                                           
+  domain: automation
+  input:
+    player:
+      name: Google Hub
+      description: Google Hub or Chromecast device to cast to
+      selector:
+        entity:
+          integration: cast
+    starttime:
+      name: Starttime
+      description: Time at which the casting should start
+      default: "06:30:00"
+      selector:
+        time:
+    endtime:
+      name: Endtime
+      description: Time at which to stop casting
+      default: "02:00:00"
+      selector:
+       time:
+    dashboard:
+      name: Home Assistant dashboard path
+      description: Path to the dashboard. Defaults to 'lovelace' if empty.
+      default: lovelace
+    view:
+      name: Dashboard view path
+      description: Path of the view to cast. A path has to be defined in your dashboard YAML for each view, as outlined in the views documentation.
+      default: cast
+
+trigger:
+- platform: state
+  entity_id: !input 'player'
+  to: 'off'
+  for: 00:00:20
+- platform: state
+  entity_id: !input 'player'
+  to: paused
+  for: 00:00:20
+- platform: time_pattern
+  minutes: /9
+- platform: time_pattern
+  minutes: '0'
+
+action:
+- choose:
+  - conditions:
+    - condition: time
+      after: !input 'starttime'
+      before: !input 'endtime'
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: !input 'player'
+        state: 'off'
+      - condition: state
+        entity_id: !input 'player'
+        state: idle
+        for: 00:00:20
+      - condition: state
+        entity_id: !input 'player'
+        state: paused
+        for: 00:00:20
+    sequence:
+    - service: media_player.volume_mute
+      data:
+        is_volume_muted: true
+        entity_id: !input 'player'
+    - service: media_player.turn_off
+      data:
+        entity_id: !input 'player'
+    - delay:
+        seconds: 2
+    - service: media_player.turn_on
+      data:
+        entity_id: !input 'player'
+    - delay:
+        seconds: 2
+    - service: cast.show_lovelace_view
+      data:
+        view_path: !input 'view'
+        dashboard_path: !input 'dashboard'
+        entity_id: !input 'player'
+    - delay:
+        seconds: 10
+    - service: media_player.volume_mute
+      data:
+        is_volume_muted: false
+        entity_id: !input 'player'
