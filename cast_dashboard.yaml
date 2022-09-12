@@ -22,6 +22,12 @@ blueprint:
       default: "02:00:00"
       selector:
        time:
+    resettime:
+      name: Starttime
+      description: Time at which the NestHub gets resetted
+      default: "06:28:00"
+      selector:
+        time:
     dashboard:
       name: Home Assistant dashboard path
       description: Path to the dashboard. Defaults to 'lovelace' if empty.
@@ -44,6 +50,9 @@ trigger:
   minutes: /9
 - platform: time_pattern
   minutes: '0'
+- platform: time
+  at: !input 'resettime'
+  id: 'resettime'
 
 action:
 - choose:
@@ -89,4 +98,12 @@ action:
     - service: media_player.volume_mute
       data:
         is_volume_muted: false
+        entity_id: !input 'player'
+- choose:
+  - conditions:
+    - condition: trigger
+      id: 'resettime'
+    sequence:
+    - service: media_player.media_stop
+      data:
         entity_id: !input 'player'
