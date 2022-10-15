@@ -23,19 +23,19 @@ blueprint:
       selector:
        time:
     dashboardToCast:
-      name: Home Assistant dashboard path
+      name: Home Assistant dashboard path to Cast
       description: Path to the dashboard. Defaults to 'lovelace' if empty.
       default: lovelace
     dashboardToInit:
-      name: Home Assistant dashboard path
+      name: Home Assistant dashboard path To Init
       description: Path to the dashboard. Defaults to 'lovelace' if empty.
       default: lovelace
     viewToCast:
-      name: Dashboard view path
+      name: Dashboard view path to Cast
       description: Path of the view to cast. A path has to be defined in your dashboard YAML for each view, as outlined in the views documentation.
       default: cast
     viewToInit:
-      name: Dashboard view path
+      name: Dashboard view path to Init
       description: Path of the view to cast. A path has to be defined in your dashboard YAML for each view, as outlined in the views documentation.
       default: cast
 
