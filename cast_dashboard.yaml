@@ -22,11 +22,19 @@ blueprint:
       default: "02:00:00"
       selector:
        time:
-    dashboard:
+    dashboardToCast:
       name: Home Assistant dashboard path
       description: Path to the dashboard. Defaults to 'lovelace' if empty.
       default: lovelace
-    view:
+    dashboardToInit:
+      name: Home Assistant dashboard path
+      description: Path to the dashboard. Defaults to 'lovelace' if empty.
+      default: lovelace
+    viewToCast:
+      name: Dashboard view path
+      description: Path of the view to cast. A path has to be defined in your dashboard YAML for each view, as outlined in the views documentation.
+      default: cast
+    viewToInit:
       name: Dashboard view path
       description: Path of the view to cast. A path has to be defined in your dashboard YAML for each view, as outlined in the views documentation.
       default: cast
@@ -81,11 +89,18 @@ action:
         seconds: 2
     - service: cast.show_lovelace_view
       data:
-        view_path: !input 'view'
-        dashboard_path: !input 'dashboard'
+        view_path: !input 'viewToInit'
+        dashboard_path: !input 'dashboardToInit'
         entity_id: !input 'player'
     - delay:
-        seconds: 10
+        seconds: 15
+    - service: cast.show_lovelace_view
+      data:
+        view_path: !input 'viewToCast'
+        dashboard_path: !input 'dashboardToCast'
+        entity_id: !input 'player'
+    - delay:
+        seconds: 5
     - service: media_player.volume_mute
       data:
         is_volume_muted: false
